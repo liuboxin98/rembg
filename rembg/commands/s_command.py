@@ -3,6 +3,7 @@ import os
 import webbrowser
 from typing import Optional, Tuple, cast, List
 
+import base64
 import aiohttp
 import click
 import gradio as gr
@@ -10,6 +11,7 @@ import uvicorn
 from asyncer import asyncify
 from fastapi import Depends, FastAPI, File, Form, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from starlette.responses import Response
 
 from .._version import get_versions
@@ -260,8 +262,6 @@ def s_command(port: int, host: str, log_level: str, threads: int) -> None:
     ):
         return await asyncify(im_without_bg)(file, commons)  # type: ignore
     
-
-
     @app.post(
         path="/api/remove/batch",
         tags=["Background Removal batch"],
@@ -271,16 +271,23 @@ def s_command(port: int, host: str, log_level: str, threads: int) -> None:
     async def post_index(
         files: List[UploadFile] = File(
             default=...,
-            description="Image file (byte stream) that has to be processed.",
+            description="List of image files (byte streams) that have to be processed.",
         ),
         commons: CommonQueryPostParams = Depends(),
     ):
         results = []
         for file in files:
             file_bytes = await file.read()
-            result = await asyncify(im_without_bg)(file_bytes, commons)  
-            results.append(result)
-        return results
+            result = await asyncify(im_without_bg)(file_bytes, commons)  # type: ignore
+            
+            if hasattr(result, 'body') and isinstance(result.body, bytes):
+                # encoded_image = base64.b64encode(result.body).decode('utf-8')
+                results.append(result.body)
+            else:
+                raise TypeError("The result does not contain a bytes-like body")
+        
+        # return JSONResponse(content={"images": results})
+        return Response(content=b''.join(results), media_type="application/octet-stream")
 
     def gr_app(app):
         def inference(input_path, model, *args):
