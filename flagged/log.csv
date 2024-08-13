@@ -1,0 +1,2 @@
+Input,Models,Alpha matting,Foreground threshold,Background threshold,Erosion size,Only mask,Post process mask,Arguments,Output,flag,username,timestamp
+,u2net,true,240,10,40,false,true,,,,,2024-08-13 17:18:07.284174

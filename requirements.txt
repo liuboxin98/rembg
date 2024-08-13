@@ -1,0 +1,15 @@
+filetype
+watchdog
+aiohttp
+gradio
+asyncer
+numpy
+onnxruntime
+opencv-python
+Pillow
+pymatting
+pooch
+jsonschema
+click
+tqdm
+fastapi

@@ -374,3 +374,8 @@ Liked some of my work? Buy me a coffee (or more likely a beer)
 Copyright (c) 2020-present [Daniel Gatis](https://github.com/danielgatis)
 
 Licensed under [MIT License](./LICENSE.txt)
+
+
+#### new 
+
+pip install numpy -i https://pypi.tuna.tsinghua.edu.cn/simple

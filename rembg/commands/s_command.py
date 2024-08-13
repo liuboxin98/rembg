@@ -1,14 +1,14 @@
 import json
 import os
 import webbrowser
-from typing import Optional, Tuple, cast
+from typing import Optional, Tuple, cast, List
 
 import aiohttp
 import click
 import gradio as gr
 import uvicorn
 from asyncer import asyncify
-from fastapi import Depends, FastAPI, File, Form, Query
+from fastapi import Depends, FastAPI, File, Form, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 
@@ -259,6 +259,28 @@ def s_command(port: int, host: str, log_level: str, threads: int) -> None:
         commons: CommonQueryPostParams = Depends(),
     ):
         return await asyncify(im_without_bg)(file, commons)  # type: ignore
+    
+
+
+    @app.post(
+        path="/api/remove/batch",
+        tags=["Background Removal batch"],
+        summary="Remove from Stream batch",
+        description="Removes the background from an image sent within the request itself.",
+    )
+    async def post_index(
+        files: List[UploadFile] = File(
+            default=...,
+            description="Image file (byte stream) that has to be processed.",
+        ),
+        commons: CommonQueryPostParams = Depends(),
+    ):
+        results = []
+        for file in files:
+            file_bytes = await file.read()
+            result = await asyncify(im_without_bg)(file_bytes, commons)  
+            results.append(result)
+        return results
 
     def gr_app(app):
         def inference(input_path, model, *args):
