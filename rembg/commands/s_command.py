@@ -1,9 +1,9 @@
+import base64
 import json
 import os
 import webbrowser
-from typing import Optional, Tuple, cast, List
+from typing import List, Optional, Tuple, cast
 
-import base64
 import aiohttp
 import click
 import gradio as gr
