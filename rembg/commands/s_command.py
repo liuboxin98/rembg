@@ -281,13 +281,14 @@ def s_command(port: int, host: str, log_level: str, threads: int) -> None:
             result = await asyncify(im_without_bg)(file_bytes, commons)  # type: ignore
             
             if hasattr(result, 'body') and isinstance(result.body, bytes):
-                # encoded_image = base64.b64encode(result.body).decode('utf-8')
-                results.append(result.body)
+                encoded_image = base64.b64encode(result.body).decode('utf-8')
+                results.append(encoded_image)
+                # results.append(result.body)
             else:
                 raise TypeError("The result does not contain a bytes-like body")
         
-        # return JSONResponse(content={"images": results})
-        return Response(content=b''.join(results), media_type="application/octet-stream")
+        return JSONResponse(content={"images": results})
+        # return Response(content=results, media_type="application/octet-stream")
 
     def gr_app(app):
         def inference(input_path, model, *args):
